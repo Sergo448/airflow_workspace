@@ -1,0 +1,12 @@
+{
+    "greenplum": {
+      "conn_id": "greenplum",
+      "conn_type": "postgres",
+      "description": "My greenplum connection",
+      "host": "host.docker.internal",
+      "database": "postgres",
+      "login": "gpadmin",
+      "password": "dataroad",
+      "port": 6543
+    }
+  }

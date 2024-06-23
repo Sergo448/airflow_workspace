@@ -12,6 +12,7 @@ x-environment: &airflow_environment
 
 x-airflow-image: &airflow_image apache/airflow:latest
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
+
 services:
   postgres:
     image: postgres:12-alpine
