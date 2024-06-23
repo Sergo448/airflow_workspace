@@ -36,6 +36,7 @@ $ docker-compose --version
 
 Вот предлагаемая структура для вашего проекта:
 
+
 my_project/
 │
 ├── airflow/                  # Directory for all Airflow-related files
@@ -48,6 +49,7 @@ my_project/
 │   ├── docker-compose.yml    # Docker Compose file for defining your services
 │
 └── ...                       # Other directories and files for your project
+
 В этой структуре:
 
 В airflow/ каталоге хранятся все файлы, связанные с Airflow. Это позволяет отделить настройку Airflow от остальной части вашего проекта, упрощая управление.
@@ -92,6 +94,7 @@ RUN echo "[core]" > ${AIRFLOW_HOME}/airflow.cfg && \
     echo "base_url = http://localhost:8080" >> ${AIRFLOW_HOME}/airflow.cfg && \
     echo "web_server_host = 0.0.0.0" >> ${AIRFLOW_HOME}/airflow.cfg && \
     echo "web_server_port = 8080" >> ${AIRFLOW_HOME}/airflow.cfg{AIRFLOW_HOME}/airflow.cfg
+
 В этом файле Dockerfile мы сначала устанавливаем для AIRFLOW_HOME переменной окружения значение /usr/local/airflow. Затем мы переключаемся на пользователя root с помощью USER root директивы. Это необходимо, потому что нам нужны права root для создания каталога и смены владельца.
 
 Далее мы создаем AIRFLOW_HOME каталог и меняем его владельца на airflow пользователя. Это делается с помощью RUN mkdir -p ${AIRFLOW_HOME} && chown -R airflow: ${AIRFLOW_HOME} команды. -p Опция в mkdir команде гарантирует, что каталог будет создан, если он не существует.
@@ -122,6 +125,7 @@ web_server_host = 0.0.0.0
 
 # The port to bind to
 web_server_port = 8080
+
 После создания этого файла Dockerfile вы можете создать свой пользовательский образ Airflow Docker с помощью docker build команды. Вот пример:
 
 
@@ -164,7 +168,7 @@ services:
       - POSTGRES_USER=airflow
       - POSTGRES_PASSWORD=airflow
       - POSTGRES_DB=airflow
-      
+
 В этом файле Docker Compose мы определяем три службы: webserver, scheduler и postgres. Директива build предписывает Docker Compose создать образ, используя Dockerfile в текущем каталоге. volumes Директива сопоставляет ./dags каталог на вашем хост-компьютере с /usr/local/airflow/dags каталогом в контейнере Docker, позволяя вам хранить ваши базы данных на вашем хост-компьютере. Директива ports сопоставляет порт 8080 на вашем хост-компьютере с портом 8080 в контейнере Docker, позволяя вам получить доступ к веб-серверу Airflow по адресу http://localhost:8080.
 
 postgres Сервис использует postgres:latest образ и устанавливает переменные среды непосредственно в файле Docker Compose. Эти переменные среды используются для настройки базы данных Postgres.
@@ -221,6 +225,7 @@ services:
       - "8080:8080"
     mem_limit: 512m
     cpu_shares: 512
+    
 Параметр cpu_shares позволяет управлять ресурсами процессора, которые может использовать контейнер. Значение представляет собой относительный вес по сравнению с другими контейнерами. Например, если один контейнер имеет значение 1024, а другой - 512, первый контейнер получит вдвое больше процессорного времени, чем второй.
 
 Это простое дополнение может оказать глубокое влияние на производительность вашей системы, гарантируя эффективное использование ваших ресурсов и бесперебойную работу конвейера передачи данных. Именно эти небольшие настройки и оптимизации могут иметь большое значение в долгосрочной перспективе, превращая хороший конвейер данных в отличный.

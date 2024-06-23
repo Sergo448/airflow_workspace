@@ -9,6 +9,8 @@ services:
       - ./dags:/usr/local/airflow/dags
     ports:
       - "8080:8080"
+    mem_limit: 512m
+    cpu_shares: 512
   scheduler:
     build:
       context: .
