@@ -18,14 +18,11 @@ SQL_STR_DICT: dict = dict({
         drop table if exists raw.mock_data;
         
         create table raw.mock_data(
-            id BIGSERIAL NOT NULL PRIMARY KEY,
-            first_name VARCHAR(150) NOT NULL,
-            last_name VARCHAR(150) NOT NULL,
-            email VARCHAR(150) NOT NULL,
-            gender VARCHAR(150) NOT NULL,
-            phone_number VARCHAR(150) NOT NULL,
-            birth VARCHAR(255) NOT NULL,
-            country VARCHAR(150) NOT NULL
+            first_name VARCHAR(255) NOT NULL,
+            last_name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            gender VARCHAR(255) NOT NULL,
+            ip_address VARCHAR(255) NOT NULL
         );
         """,
     "CREATE_TABLE_STR_PD" :\
@@ -33,14 +30,11 @@ SQL_STR_DICT: dict = dict({
         drop table if exists raw.mock_data_pandas;
         
         create table raw.mock_data_pandas(
-            id BIGSERIAL NOT NULL PRIMARY KEY,
-            first_name VARCHAR(150) NOT NULL,
-            last_name VARCHAR(150) NOT NULL,
-            email VARCHAR(150) NOT NULL,
-            gender VARCHAR(150) NOT NULL,
-            phone_number VARCHAR(150) NOT NULL,
-            birth VARCHAR(255) NOT NULL,
-            country VARCHAR(150) NOT NULL,
+            first_name VARCHAR(255) NOT NULL,
+            last_name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            gender VARCHAR(255) NOT NULL,
+            ip_address VARCHAR(255) NOT NULL,
             report_date VARCHAR(255) NOT NULL
         );
         """,
@@ -169,7 +163,7 @@ with DAG(
     
     Link_1 = DummyOperator(task_id = 'Link_1', dag = dag, trigger_rule='one_success')
     Link_2 = DummyOperator(task_id = 'Link_2', dag = dag, trigger_rule='one_success')
-    Link_3 = DummyOperator(task_id = 'Link_3', dag = dag)
+    Link_3 = DummyOperator(task_id = 'Link_3', dag = dag, trigger_rule='none_failed_min_one_success')
     
     """ get schemas part """
     branch_chek_schemas = BranchPythonOperator(task_id = 'branch_chek_schemas',
@@ -216,7 +210,8 @@ with DAG(
     
     
     """ CONSTRUCTING GRAPH """
-    start_dag >> branch_chek_schemas >> [sckip_creating_schema, creating_schema] >> creating_table_mock_data >> Link_1 >> Link_3
-    start_dag >> branch_chek_tables >> [sckip_creating_mock_data_pandas, creating_table_mock_data_pandas] >> Link_2 >> Link_3
+    start_dag >> branch_chek_schemas >> [sckip_creating_schema, creating_schema] >> Link_2 >> creating_table_mock_data >> Link_1 >> Link_3
+    
+    Link_2 >> branch_chek_tables >> [sckip_creating_mock_data_pandas, creating_table_mock_data_pandas] >> Link_3
     
     Link_3 >> [get_data, get_data_pd] >> end_dag
